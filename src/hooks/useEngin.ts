@@ -1,15 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useType } from "./useType";
 import { useWords } from "./useWrods";
 import { useNavigate } from "react-router-dom";
 import { TOTAL_TIME } from "@/utils/global";
+import { useState } from "react";
+import { useInputContext } from "../components/input-provider";
 
 export const useEngin = () => {
-    const { words, updateWords } = useWords(10);
+    const { words, updateWords, updateGeneratedWords } = useWords(10);
     const [totalTime, setTotalTime] = useState(TOTAL_TIME);
+    const { input, setInput } = useInputContext();
     const { setTimeLeft,
-        calculateWPM, calculateAccuracy, calculateWords, input, setInput, handelTyping, timeLeft, resetCountdown, setIsTyping
-    } = useType(words, totalTime);
+        calculateWPM, calculateAccuracy, calculateWords, handelTyping, timeLeft, resetCountdown, setIsTyping
+    } = useType(words, totalTime, updateGeneratedWords);
     const navigate = useNavigate();
 
     // Reset countdown when totalTime changes

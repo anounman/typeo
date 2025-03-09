@@ -41,7 +41,7 @@ function ResultPage() {
             <div className="text-6xl text-yellow-500">{accuracy}%</div>
           </div>
           <div>
-            <div className="text-gray-500 uppercase text-sm mb-2">Raw WPM</div>
+            <div className="text-gray-500 uppercase text-sm mb-2">Raw Words</div>
             <div className="text-6xl text-yellow-500">{words}</div>
           </div>
         </div>

@@ -4,6 +4,7 @@ import AppLayout from "./layout/app-layout";
 import { ThemeProvider } from "./components/theme-provider";
 import HomePage from "./pages/home-page";
 import ResultPage from "./pages/result-page";
+import { InputProvider } from "./components/input-provider";
 
 function App() {
   const router = createBrowserRouter([
@@ -24,7 +25,9 @@ function App() {
 
   return (
     <ThemeProvider defaultTheme="dark">
-      <RouterProvider router={router} />
+      <InputProvider>
+        <RouterProvider router={router} />
+      </InputProvider>
     </ThemeProvider>
   );
 }

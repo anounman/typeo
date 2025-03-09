@@ -3,29 +3,39 @@ import { useCallback, useEffect, useState } from "react";
 import { useCountdown } from "./useCountdown";
 import { useCalculate } from "./useCalculate";
 import { useNavigate } from "react-router-dom";
+import { faker } from "@faker-js/faker";
+import { useInputContext } from "../components/input-provider";
 
-export const useType = (words: string, time: number) => {
-
-  const [input, setInput] = useState<string>('');
+export const useType = (words: string, time: number, updateGeneratedWords: (newWords: string) => void) => {
+  const { input, setInput } = useInputContext();
   const [newTime, setNewTime] = useState<number>(time);
   const [isTyping, setIsTyping] = useState<boolean>(true);
   const { timeLeft, startCountdown, resetCountdown, setTimeLeft } = useCountdown(newTime);
-  const { calculateWords, calculateAccuracy, calculateWPM, calculateRawWPM } = useCalculate(input, words, newTime);
+  const { calculateWords, calculateAccuracy, calculateWPM, calculateRawWords } = useCalculate(input, words, newTime);
   const navigate = useNavigate();
+
   const handelTyping = useCallback((e: KeyboardEvent) => {
     e.preventDefault();
     if (e.key === words.split("")[0]) {
       startCountdown();
-
     }
     if (isTyping) {
       formateInput(e, setInput, isTyping);
     }
-  }, [isTyping, words, startCountdown]);
+  }, [isTyping, words, startCountdown, setInput]);
 
   useEffect(() => {
     setNewTime(time);
   }, [time])
+
+  // Check if user is approaching the end of words and add more
+  useEffect(() => {
+    // If user has typed more than n-3 words, add more words
+    if (input.split(" ").length >= words.split(" ").length - 3 && timeLeft > 0) {
+      const newWords = faker.lorem.words(5); // Generate 5 new words
+      updateGeneratedWords(newWords);
+    }
+  }, [input, words, timeLeft, updateGeneratedWords]);
 
   useEffect(() => {
     const wordsArray: Array<string> = words.split("");
@@ -38,11 +48,6 @@ export const useType = (words: string, time: number) => {
     inputArray.forEach((inputChar, index) => {
       const char = document.getElementById(`${index}`);
       if (char) {
-        //   console.log(
-        //     `inputChar: ${inputChar}, wordsArray[index]: ${wordsArray[index]} ${
-        //       inputChar === wordsArray[index]
-        //     }`
-        //   );
         if (inputChar === wordsArray[index]) {
           char.classList.replace("text-slate-500", "text-yellow-500");
         } else {
@@ -59,13 +64,13 @@ export const useType = (words: string, time: number) => {
         state: {
           wpm: calculateWPM().toFixed(0),
           accuracy: calculateAccuracy().toFixed(0),
-          words: calculateRawWPM().toFixed(0),
+          words: calculateRawWords().toFixed(0),
           characters: input.length,
           totalTime: newTime,
         }
       });
     }
-  }, [newTime , isTyping, timeLeft, navigate, calculateWPM, calculateAccuracy, calculateWords, calculateRawWPM, input]);
-  return { calculateWPM, calculateAccuracy, input, setInput, handelTyping, setIsTyping, timeLeft, resetCountdown, startCountdown, calculateWords, setTimeLeft };
+  }, [newTime, isTyping, timeLeft, navigate, calculateWPM, calculateAccuracy, calculateWords, calculateRawWords, input]);
 
+  return { calculateWPM, calculateAccuracy, input, setInput, handelTyping, setIsTyping, timeLeft, resetCountdown, startCountdown, calculateWords, setTimeLeft };
 };

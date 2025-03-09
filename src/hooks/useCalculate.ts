@@ -31,15 +31,15 @@ export const useCalculate = (input: string, originalWrod: string, total_time: nu
 
         return Number.isNaN(totalAvgWords) ? 0 : totalAvgWords;
     }, [input, total_time]);
-    const calculateRawWPM = useCallback(() => {
+    const calculateRawWords = useCallback(() => {
         let count: number = 0;
         input.split(" ").map((word, index) => {
             if (word === originalWrod.split(" ")[index]) {
                 count++;
             }
         });
-        return (count / 5) * 60 / total_time;
-    }, [input, originalWrod, total_time])
+        return count;
+    }, [input, originalWrod]);
 
-    return { calculateWords, calculateAccuracy, calculateWPM, calculateRawWPM };
+    return { calculateWords, calculateAccuracy, calculateWPM, calculateRawWords };
 }
