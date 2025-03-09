@@ -1,10 +1,10 @@
-import { formateInput } from "@/utils/helpers";
+import { formateInput, generateWords } from "@/utils/helpers";
 import { useCallback, useEffect, useState } from "react";
 import { useCountdown } from "./useCountdown";
 import { useCalculate } from "./useCalculate";
 import { useNavigate } from "react-router-dom";
-import { faker } from "@faker-js/faker";
 import { useInputContext } from "../components/input-provider";
+import { BASE_WORDS_LENGTH } from "@/utils/global";
 
 export const useType = (words: string, time: number, updateGeneratedWords: (newWords: string) => void) => {
   const { input, setInput } = useInputContext();
@@ -30,9 +30,8 @@ export const useType = (words: string, time: number, updateGeneratedWords: (newW
 
   // Check if user is approaching the end of words and add more
   useEffect(() => {
-    // If user has typed more than n-3 words, add more words
-    if (input.split(" ").length >= words.split(" ").length - 3 && timeLeft > 0) {
-      const newWords = faker.lorem.words(5); // Generate 5 new words
+    if (input.length >= words.length - 10 && timeLeft > 0) {
+      const newWords = generateWords(BASE_WORDS_LENGTH); // Generate 5 new words
       updateGeneratedWords(newWords);
     }
   }, [input, words, timeLeft, updateGeneratedWords]);

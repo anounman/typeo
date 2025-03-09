@@ -3,13 +3,14 @@ import { useCallback } from "react";
 export const useCalculate = (input: string, originalWrod: string, total_time: number) => {
     const calculateWords = useCallback(() => {
         let count: number = 0;
-        input.split(" ").map((word, index) => {
-            if (word === originalWrod.split(" ")[index]) {
+
+        input.split(" ").map((char) => {
+            if (char !== " ") {
                 count++;
             }
         });
-        return count;
-    }, [input, originalWrod]);
+        return count - 1;
+    }, [input]);
 
 
     const calculateAccuracy = useCallback(() => {

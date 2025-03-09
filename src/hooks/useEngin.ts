@@ -2,12 +2,12 @@ import { useEffect } from "react";
 import { useType } from "./useType";
 import { useWords } from "./useWrods";
 import { useNavigate } from "react-router-dom";
-import { TOTAL_TIME } from "@/utils/global";
+import { BASE_WORDS_LENGTH, TOTAL_TIME } from "@/utils/global";
 import { useState } from "react";
 import { useInputContext } from "../components/input-provider";
 
 export const useEngin = () => {
-    const { words, updateWords, updateGeneratedWords } = useWords(10);
+    const { words, updateWords, updateGeneratedWords } = useWords(BASE_WORDS_LENGTH);
     const [totalTime, setTotalTime] = useState(TOTAL_TIME);
     const { input, setInput } = useInputContext();
     const { setTimeLeft,
