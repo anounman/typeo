@@ -1,5 +1,11 @@
 import { motion } from "framer-motion";
-const Cursor = ({ className = "" }: { className?: string }) => {
+const Cursor = ({
+  className = "",
+  color = "bg-yellow-500",
+}: {
+  className?: string;
+  color?: string;
+}) => {
   return (
     <motion.div
       aria-hidden={true}
@@ -12,7 +18,7 @@ const Cursor = ({ className = "" }: { className?: string }) => {
         repeat: Infinity,
         repeatType: "reverse",
       }}
-      className={`${className}inline-block  w-0.5 h-7 bg-yellow-500 rounded-full`}
+      className={`${className}inline-block ${color}  w-0.5 h-7  rounded-full`}
     />
   );
 };

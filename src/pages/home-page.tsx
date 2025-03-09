@@ -31,6 +31,9 @@ const HomePage = () => {
           <Typing
             words={words}
             input={input}
+            totalTime={totalTime}
+            timeLeft={timeLeft}
+            // onType={handelTyping}
             className="absolute inset-0 text-4xl"
           />
         </div>

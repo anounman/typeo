@@ -39,5 +39,5 @@ export const useEngin = () => {
         }
     }, [handelTyping]);
 
-    return { calculateAccuracy, words, restart, input, setInput, timeLeft, calculateWords, calculateWPM, setTimeLeft, setTotalTime, totalTime };
+    return { calculateAccuracy, words, restart, input, setInput, timeLeft, calculateWords, calculateWPM, setTimeLeft, setTotalTime, totalTime, handelTyping };
 };

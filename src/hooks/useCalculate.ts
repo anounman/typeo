@@ -42,5 +42,17 @@ export const useCalculate = (input: string, originalWrod: string, total_time: nu
         return count;
     }, [input, originalWrod]);
 
-    return { calculateWords, calculateAccuracy, calculateWPM, calculateRawWords };
+
+    const calculateTheErros = useCallback(() => {
+        let count: number = 0;
+        input.split("").map((word, index) => {
+            if (word !== originalWrod.split("")[index]) {
+                count++;
+            }
+        });
+        return count;
+    }, [input, originalWrod]);
+
+
+    return { calculateWords, calculateAccuracy, calculateWPM, calculateRawWords, calculateTheErros };
 }
