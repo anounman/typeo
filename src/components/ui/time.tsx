@@ -1,5 +1,7 @@
 // import { useCustomTime } from "@/hooks/useCustomTime";
 
+import { setTotalTimeOnLocalStorage } from "@/utils/global";
+
 const Time = ({
   totalTime,
   setTotalTime,
@@ -19,6 +21,7 @@ const Time = ({
           key={t}
           onClick={() => {
             setTotalTime(parseInt(t));
+            setTotalTimeOnLocalStorage(parseInt(t));
           }}
         >
           {t}
