@@ -2,13 +2,15 @@ import { motion } from "framer-motion";
 const Results = ({
   errors,
   accuracyPercentage,
-  total,
+  wordCount,
   className,
+  wpm,
 }: {
   errors: number;
   accuracyPercentage: number;
-  total: number;
+  wordCount: number;
   className?: string;
+  wpm?: number;
 }) => {
   const initial = { opacity: 0 };
   const animate = { opacity: 1 };
@@ -47,8 +49,16 @@ const Results = ({
             animate={animate}
             transition={{ ...duration, delay: 1.4 }}
           >
-            Typed: {total}
+            Word Count: {wordCount}
           </motion.li>
+          {wpm && <motion.li
+            initial={initial}
+            animate={animate}
+            transition={{ ...duration, delay: 1.4 }}
+            
+          >
+            WPM: {wordCount}
+          </motion.li>}
         </div>
       </motion.ul>
     </div>

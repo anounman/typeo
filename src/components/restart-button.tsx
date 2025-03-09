@@ -9,7 +9,7 @@ const RestartButton = ({
     className?: string
 }) => {
 
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);  
   const handelClick = () => {
       buttonRef?.current?.blur();
       handelRestart();

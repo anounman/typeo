@@ -3,6 +3,7 @@ import "./App.css";
 import AppLayout from "./layout/app-layout";
 import { ThemeProvider } from "./components/theme-provider";
 import HomePage from "./pages/home-page";
+import ResultPage from "./pages/result-page";
 
 function App() {
   const router = createBrowserRouter([
@@ -12,6 +13,10 @@ function App() {
         {
           path: "/",
           element: <HomePage />,
+        },
+        {
+          path: "/result",
+          element: <ResultPage />,
         },
       ],
     },
