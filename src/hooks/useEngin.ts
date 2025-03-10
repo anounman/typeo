@@ -5,6 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { BASE_WORDS_LENGTH, TOTAL_TIME } from "@/utils/global";
 import { useState } from "react";
 import { useInputContext } from "../components/input-provider";
+import { getSocket } from "@/api/room-socket";
+import { Socket } from "socket.io-client";
+
 
 export const useEngin = () => {
     const { words, updateWords, updateGeneratedWords } = useWords(BASE_WORDS_LENGTH);
@@ -14,6 +17,9 @@ export const useEngin = () => {
         calculateWPM, calculateAccuracy, calculateWords, handelTyping, timeLeft, resetCountdown, setIsTyping
     } = useType(words, totalTime, updateGeneratedWords);
     const navigate = useNavigate();
+    const socketInstance = getSocket();
+    const [socket, setSocket] = useState<Socket | null>(socketInstance);
+
 
     // Reset countdown when totalTime changes
     useEffect(() => {
@@ -21,6 +27,9 @@ export const useEngin = () => {
         setTimeLeft(totalTime);
     }, [totalTime, resetCountdown, setTimeLeft]);
 
+    useEffect(() => {
+        setSocket(socketInstance);
+    }, [socketInstance]);
     const restart = () => {
         const url = window.location.pathname;
         if (url !== '/') {
@@ -32,6 +41,7 @@ export const useEngin = () => {
         setIsTyping(true);
     }
 
+
     useEffect(() => {
         window.addEventListener("keydown", handelTyping);
         return () => {
@@ -39,5 +49,5 @@ export const useEngin = () => {
         }
     }, [handelTyping]);
 
-    return { calculateAccuracy, words, restart, input, setInput, timeLeft, calculateWords, calculateWPM, setTimeLeft, setTotalTime, totalTime, handelTyping };
+    return { calculateAccuracy, words, restart, input, setInput, timeLeft, calculateWords, calculateWPM, setTimeLeft, setTotalTime, totalTime, handelTyping, socket };
 };

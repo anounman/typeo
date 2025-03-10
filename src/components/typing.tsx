@@ -1,22 +1,17 @@
-import { useCursorTracking } from "@/hooks/useCursorTracking";
-import { CursorOverlay } from "./ui/cursor-overlay";
+import Cursor from "./ui/cursor";
 
 export const Typing = ({
   words,
   className,
   input,
-  totalTime,
-  timeLeft,
+  
 }: {
   words: string;
   className?: string;
   input: string;
-  totalTime: number;
-  timeLeft: number;
 }) => {
-  const { allCursors } = useCursorTracking(input, words, totalTime - timeLeft);
-
   return (
+    
     <div className={`${className}`}>
       {input.split("").map((_char, index) => {
         return (
@@ -25,8 +20,7 @@ export const Typing = ({
           </span>
         );
       })}
-      {/* <Cursor /> */}
-      <CursorOverlay cursors={allCursors} />
+      <Cursor />
     </div>
   );
 };

@@ -6,8 +6,17 @@ import Results from "../components/Results";
 import { Typing } from "../components/typing";
 import { useEngin } from "../hooks/useEngin";
 import Time from "@/components/ui/time";
+import useSocket from "@/hooks/useSocket";
+import { useState } from "react";
+import { createRoom } from "@/api/room-socket";
+import { User } from "@/types/type";
+import { UserImpl } from "@/types/mode";
+import { v4 as uuid } from "uuid";
 
 const HomePage = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [roomName] = useState<string>("test");
+
   const {
     calculateAccuracy,
     words,
@@ -18,6 +27,12 @@ const HomePage = () => {
     totalTime,
     setTotalTime,
   } = useEngin();
+
+  const {
+    // error : roomCreateError,
+    fn: createRoomFn,
+    // loading: createRoomLoading,
+  } = useSocket(createRoom);
 
   return (
     <div className="grid gap-10">
@@ -31,9 +46,6 @@ const HomePage = () => {
           <Typing
             words={words}
             input={input}
-            totalTime={totalTime}
-            timeLeft={timeLeft}
-            // onType={handelTyping}
             className="absolute inset-0 text-4xl"
           />
         </div>
@@ -51,6 +63,14 @@ const HomePage = () => {
         wordCount={calculateWords()}
         className={``}
       />
+      <button
+        onClick={async () => {
+          setUser(new UserImpl({ id: uuid().toString(), name: "test" }));
+          await createRoomFn(roomName, user!);
+        }}
+      >
+        Create Room
+      </button>
     </div>
   );
 };
