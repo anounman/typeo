@@ -1,12 +1,12 @@
-import express, { } from "express";
-import router from "./routes/index";
+import express from "express";
 import http from 'http';
 import { Server } from 'socket.io';
 import cors from 'cors';
+import router from "./routes/index";
 import { socketSetup } from "./socket";
 
 const app = express();
-const server = http.createServer(app);
+const server = http.createServer(app);  // important for socket.io
 const io = new Server(server, {
 	cors: {
 		origin: "*",
@@ -16,21 +16,17 @@ const io = new Server(server, {
 
 const PORT = process.env.PORT || 3000;
 
-
+// Middleware
 app.use(express.json());
 app.use(cors());
-app.use(express.json());
 
+// Routes
+app.use('/', router);	
 
-//routes
-app.use('/', router);
-
-
-
-//Initilize socket connections 
+// Initialize Socket.IO
 socketSetup(io);
 
-//start the server 
-app.listen(PORT, () => {
-	console.log(`Server is running on port http://localhost:${PORT}`);
+// Make the HTTP server listen, instead of app.listen
+server.listen(PORT, () => {
+	console.log(`Server is running on http://localhost:${PORT}`);
 });
