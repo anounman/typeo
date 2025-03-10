@@ -1,3 +1,9 @@
+### Backend Explanation
+
+For detailed implementation of the backend code and architecture, please refer to our backend repository:
+[Backend Code Repository](https://github.com/anounman/typeo/tree/backend)
+
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
