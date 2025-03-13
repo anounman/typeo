@@ -90,15 +90,15 @@ export const useType = (
     if (timeLeft === 0) {
       setIsTyping(false);
       // TODO: must uncomment this line
-      // navigate('/result', {
-      //   state: {
-      //     wpm: calculateWPM().toFixed(0),
-      //     accuracy: calculateAccuracy().toFixed(0),
-      //     words: calculateRawWords().toFixed(0),
-      //     characters: input.length,
-      //     totalTime: newTime,
-      //   }
-      // });
+      navigate('/result', {
+        state: {
+          wpm: calculateWPM().toFixed(0),
+          accuracy: calculateAccuracy().toFixed(0),
+          words: calculateRawWords().toFixed(0),
+          characters: input.length,
+          totalTime: newTime,
+        }
+      });
     }
   }, [newTime, isTyping, timeLeft, navigate, calculateWPM, calculateAccuracy, calculateWords, calculateRawWords, input]);
 
