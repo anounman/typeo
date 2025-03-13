@@ -7,10 +7,10 @@ import { useEngin } from "../hooks/useEngin";
 import Time from "@/components/ui/time";
 import { useState } from "react";
 import JoinOrCreateRoom from "./join-or-create-room";
-import { Keyboard, RefreshCw, Clock } from "lucide-react"; // Import icons
+import { Keyboard, RefreshCw, Clock, Users, BarChart } from "lucide-react";
 
 const HomePage = () => {
-  const [showOnlineOptions, setShowOnlineOptions] = useState<boolean>(true);
+  const [showOnlineOptions, setShowOnlineOptions] = useState<boolean>(false);
 
   const {
     calculateAccuracy,
@@ -25,76 +25,79 @@ const HomePage = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="grid gap-10 ">
-        {/* Header with title */}
-        <div className="flex justify-center mb-4">
-          <div className="flex items-center gap-3">
-            <Keyboard size={28} className="text-yellow-500" />
-            <h1 className="text-3xl font-bold text-white">TypeO</h1>
+      {/* Header with title and play online button */}
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-8">
+        <div className="flex items-center gap-3 mb-4 sm:mb-0">
+          <div className="bg-gradient-to-br from-yellow-500 to-amber-600 p-2 rounded-lg shadow-lg">
+            <Keyboard size={28} className="text-slate-900" />
           </div>
+          <h1 className="text-3xl font-bold text-white">TypeO</h1>
         </div>
 
-        <div className="flex flex-col justify-center">
-          {/* Timer and Settings Panel */}
-          <div className="bg-slate-800/60 rounded-lg p-4 mb-4 flex justify-between items-center shadow-lg border border-slate-700">
-            <div className="flex items-center gap-2">
-              <RefreshCw size={18} className="text-slate-400" />
+        <button
+          onClick={() => setShowOnlineOptions(true)}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-yellow-500 to-amber-500 text-slate-900 hover:from-yellow-400 hover:to-amber-400 transition-all transform hover:scale-105 shadow-md font-medium"
+        >
+          <Users size={18} />
+          Play With Friends
+        </button>
+      </div>
+
+      {/* Main Content */}
+      <div className="grid gap-8">
+        {/* Control Panel */}
+        <div className="bg-slate-800/60 backdrop-blur-sm rounded-xl p-5 shadow-lg border border-slate-700/50">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            {/* Timer */}
+            <div className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-slate-700/50">
+              <RefreshCw size={18} className="text-yellow-500" />
               <CoundownTimer timeLeft={timeLeft} />
             </div>
-            <div className="flex items-center gap-2">
-              <Clock size={18} className="text-slate-400" />
-              <Time totalTime={totalTime} setTotalTime={setTotalTime} />
-            </div>
-          </div>
 
-          {/* Typing Area */}
-          <div className="relative bg-slate-800/40 rounded-lg p-6 shadow-lg border border-slate-700/50 mb-6">
-            <div className="relative max-w-4xl mt-3 break-all">
-              <GeneratedText words={words} />
-              <Typing
-                words={words}
-                input={input}
-                className="absolute inset-0 text-4xl"
+            {/* Time Settings & Restart */}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-700/50">
+                <Clock size={18} className="text-yellow-500" />
+                <Time totalTime={totalTime} setTotalTime={setTotalTime} />
+              </div>
+
+              <RestartButton
+                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-all"
+                onRestart={restart}
               />
             </div>
           </div>
         </div>
 
-        {/* Controls */}
-        <div className="flex w-full items-center justify-center">
-          <div className="px-8 py-3 rounded-full font-medium transition-all duration-300 text-center  w-min bg-blue-600 hover:bg-blue-500 text-white">
-            <RestartButton
-              className="text-white"
-              onRestart={() => {
-                restart();
-              }}
+        {/* Typing Area - untouched internals */}
+        <div className="relative bg-gradient-to-b from-slate-800/60 to-slate-900/60 rounded-xl p-7 shadow-xl border border-slate-700/50">
+          <div className="relative max-w-4xl mx-auto mt-3 break-all">
+            <GeneratedText words={words} />
+            <Typing
+              words={words}
+              input={input}
+              className="absolute inset-0 text-4xl"
             />
           </div>
         </div>
 
         {/* Results Section */}
-        <div className="flex flex-col items-center justify-center bg-slate-800/60 rounded-lg p-6 shadow-lg border border-slate-700">
-          <h2 className="text-xl font-semibold mb-4 text-center text-slate-200">
-            Results
-          </h2>
+        <div className="bg-slate-800/60 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-slate-700/50">
+          <div className="flex items-center gap-2 mb-5 justify-center">
+            <BarChart size={20} className="text-yellow-500" />
+            <h2 className="text-xl font-semibold text-white">Performance</h2>
+          </div>
+
           <Results
             errors={0}
             accuracyPercentage={calculateAccuracy()}
             wordCount={calculateWords()}
+            className="grid grid-cols-3 gap-4"
           />
-        </div>
-
-        {/* Play Online Button */}
-        <div className="flex justify-center mt-4">
-          <button
-            onClick={() => setShowOnlineOptions(true)}
-            className="px-8 py-3 rounded-full font-medium bg-yellow-500 text-slate-900 hover:bg-yellow-400 transition-colors"
-          >
-            Play Online
-          </button>
         </div>
       </div>
 
+      {/* Online modal when active */}
       {showOnlineOptions && (
         <JoinOrCreateRoom setShowOnlineOptions={setShowOnlineOptions} />
       )}

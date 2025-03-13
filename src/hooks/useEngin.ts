@@ -24,6 +24,13 @@ export const useEngin = () => {
         setSocket(socketInstance);
         return socket;
     };
+
+    useEffect(() => {
+        setInput('');
+        resetCountdown();
+        setIsTyping(false);
+    }, []);
+
     // Reset countdown when totalTime changes
     useEffect(() => {
         resetCountdown();

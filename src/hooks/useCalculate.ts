@@ -23,12 +23,9 @@ export const useCalculate = (input: string, originalWrod: string, total_time: nu
 
 
     const calculateWPM = useCallback(() => {
-        // Standard calculation: 5 characters = 1 word
-        const elapsedMinutes = (total_time - (total_time - 1)) / 60; // Approximate time typing
-        if (elapsedMinutes <= 0) return 0;
+        const totalAvgWords = (input.length / 5) * 60 / total_time;
 
-        const wordsTyped = input.length / 5;
-        return wordsTyped / Math.max(0.01, elapsedMinutes); // Avoid division by zero
+        return Number.isNaN(totalAvgWords) ? 0 : totalAvgWords;
     }, [input, total_time]);
     const calculateRawWords = useCallback(() => {
         let count: number = 0;

@@ -13,7 +13,9 @@ export const useType = (
   updateGeneratedWords: (newWords: string) => void,
   setRoom?: React.Dispatch<React.SetStateAction<Room>>,
   // updateRoomFn?: (room: Room) => Promise<void | Room>,
-  isActive: boolean = true
+  isActive: boolean = true,
+  room?: Room,
+  isOnline: boolean = false
 ) => {
   const { input, setInput } = useInputContext();
   const [newTime, setNewTime] = useState<number>(time);
@@ -87,20 +89,28 @@ export const useType = (
   }, [input, words]);
 
   useEffect(() => {
-    if (timeLeft === 0) {
+    if (timeLeft === 0 && isTyping) {
       setIsTyping(false);
       // TODO: must uncomment this line
-      navigate('/result', {
-        state: {
-          wpm: calculateWPM().toFixed(0),
-          accuracy: calculateAccuracy().toFixed(0),
-          words: calculateRawWords().toFixed(0),
-          characters: input.length,
-          totalTime: newTime,
-        }
-      });
+      if (isOnline) {
+        navigate('/room-result', {
+          state: {
+            room: room
+          }
+        });
+      } else {
+        navigate('/result', {
+          state: {
+            wpm: calculateWPM().toFixed(0),
+            accuracy: calculateAccuracy().toFixed(0),
+            words: calculateRawWords().toFixed(0),
+            characters: input.length,
+            totalTime: newTime,
+          }
+        });
+      }
     }
-  }, [newTime, isTyping, timeLeft, navigate, calculateWPM, calculateAccuracy, calculateWords, calculateRawWords, input]);
+  }, [newTime, isTyping, timeLeft, navigate, calculateWPM, calculateAccuracy, calculateWords, calculateRawWords, input, room, isOnline]);
 
   return { calculateWPM, calculateAccuracy, input, setInput, handelTyping, setIsTyping, timeLeft, resetCountdown, startCountdown, calculateWords, setTimeLeft };
 };
