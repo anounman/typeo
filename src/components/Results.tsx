@@ -20,14 +20,6 @@ const Results = ({
       <motion.ul
         className={`flex flex-col items-center text-primary-400 space-y-3 ${className}`}
       >
-        <motion.li
-          initial={initial}
-          animate={animate}
-          transition={{ ...duration, delay: 0 }}
-          className="text-xl font-semibold"
-        >
-          Results
-        </motion.li>
         <div className="flex flex-col md:flex-row justify-center  md:gap-6 items-center w-full">
           <motion.li
             initial={initial}
@@ -51,14 +43,15 @@ const Results = ({
           >
             Word Count: {wordCount}
           </motion.li>
-          {wpm && <motion.li
-            initial={initial}
-            animate={animate}
-            transition={{ ...duration, delay: 1.4 }}
-            
-          >
-            WPM: {wordCount}
-          </motion.li>}
+          {wpm && (
+            <motion.li
+              initial={initial}
+              animate={animate}
+              transition={{ ...duration, delay: 1.4 }}
+            >
+              WPM: {wordCount}
+            </motion.li>
+          )}
         </div>
       </motion.ul>
     </div>

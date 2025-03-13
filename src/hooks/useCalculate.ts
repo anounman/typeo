@@ -14,16 +14,11 @@ export const useCalculate = (input: string, originalWrod: string, total_time: nu
 
 
     const calculateAccuracy = useCallback(() => {
-        let count: number = 0;
-        console.log(`input length : ${input.length}`);
-
-        input.split("").map((word, index) => {
-            if (word === originalWrod.split("")[index]) {
-                count++;
-            }
-        });
-        const result = (count / input.length) * 100;
-        return Number.isNaN(result) ? 0 : result;
+        let correct = 0;
+        for (let i = 0; i < input.length; i++) {
+            if (input[i] === originalWrod[i]) correct++;
+        }
+        return input.length > 0 ? (correct / input.length) * 100 : 100;
     }, [input, originalWrod]);
 
 
@@ -42,5 +37,17 @@ export const useCalculate = (input: string, originalWrod: string, total_time: nu
         return count;
     }, [input, originalWrod]);
 
-    return { calculateWords, calculateAccuracy, calculateWPM, calculateRawWords };
+
+    const calculateTheErros = useCallback(() => {
+        let count: number = 0;
+        for (let index = 0; index < input.length; index++) {
+            if (input[index] !== originalWrod[index]) {
+                count++;
+            }
+        }
+        return count;
+    }, [input, originalWrod]);
+
+
+    return { calculateWords, calculateAccuracy, calculateWPM, calculateRawWords, calculateTheErros };
 }
