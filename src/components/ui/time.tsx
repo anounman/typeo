@@ -10,7 +10,7 @@ const Time = ({
   setTotalTime: React.Dispatch<React.SetStateAction<number>>;
 }) => {
   // const { time, setTime } = useCustomTime();
-  const times = ["15", "30", "45", "60"];
+  const times = ["15", "30", "45", "60", "300000000"];
   return (
     <div className="flex gap-2">
       {times.map((t) => (

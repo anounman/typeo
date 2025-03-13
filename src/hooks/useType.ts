@@ -5,8 +5,15 @@ import { useCalculate } from "./useCalculate";
 import { useNavigate } from "react-router-dom";
 import { useInputContext } from "../components/input-provider";
 import { BASE_WORDS_LENGTH } from "@/utils/global";
+import { Room } from "@/types/type";
 
-export const useType = (words: string, time: number, updateGeneratedWords: (newWords: string) => void) => {
+export const useType = (
+  words: string,
+  time: number,
+  updateGeneratedWords: (newWords: string) => void,
+  setRoom?: React.Dispatch<React.SetStateAction<Room>>,
+  updateRoomFn?: (room: Room) => Promise<void | Room>
+) => {
   const { input, setInput } = useInputContext();
   const [newTime, setNewTime] = useState<number>(time);
   const [isTyping, setIsTyping] = useState<boolean>(true);
@@ -26,15 +33,31 @@ export const useType = (words: string, time: number, updateGeneratedWords: (newW
 
   useEffect(() => {
     setNewTime(time);
-  }, [time])
+    if (setRoom) {
+      setRoom((prev) => {
+        const newRoom: Room = prev;
+        newRoom.totalTime = time;
+        if (updateRoomFn) updateRoomFn(newRoom);
+        return newRoom;
+      });
+    }
+  }, [time, setRoom, updateRoomFn]);
 
   // Check if user is approaching the end of words and add more
   useEffect(() => {
     if (input.length >= words.length - 10 && timeLeft > 0) {
       const newWords = generateWords(BASE_WORDS_LENGTH); // Generate 5 new words
       updateGeneratedWords(newWords);
+      if (setRoom) {
+        setRoom((prev) => {
+          const newRoom: Room = prev;
+          newRoom.word = newRoom.word + " " + newWords;
+          console.log(`Room updated localy new room ${newRoom}`);
+          return newRoom;
+        });
+      }
     }
-  }, [input, words, timeLeft, updateGeneratedWords]);
+  }, [input, words, timeLeft, updateGeneratedWords, setRoom]);
 
   useEffect(() => {
     const wordsArray: Array<string> = words.split("");

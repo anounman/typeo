@@ -7,15 +7,19 @@ import { Typing } from "../components/typing";
 import { useEngin } from "../hooks/useEngin";
 import Time from "@/components/ui/time";
 import useSocket from "@/hooks/useSocket";
-import { useState } from "react";
-import { createRoom } from "@/api/room-socket";
-import { User } from "@/types/type";
-import { UserImpl } from "@/types/mode";
+import { useRef, useState } from "react";
+import { createRoom, joinRoom } from "@/api/room-socket";
+import { Room, User } from "@/types/type";
+import { RoomImpl, UserImpl } from "@/types/mode";
 import { v4 as uuid } from "uuid";
+import { useNavigate } from "react-router-dom";
+import { Input } from "@/components/ui/input";
 
 const HomePage = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [roomName] = useState<string>("test");
+  const [user, setUser] = useState<User>();
+  const navigator = useNavigate();
+  const [roomId, setRoomId] = useState<string | null>(null);
+  const roomIdInputRef = useRef<HTMLInputElement>(null);
 
   const {
     calculateAccuracy,
@@ -26,6 +30,7 @@ const HomePage = () => {
     calculateWords,
     totalTime,
     setTotalTime,
+    getInitilizedSocket,
   } = useEngin();
 
   const {
@@ -33,6 +38,37 @@ const HomePage = () => {
     fn: createRoomFn,
     // loading: createRoomLoading,
   } = useSocket(createRoom);
+
+  const { fn: joinRoomFn } = useSocket(joinRoom);
+
+  const handelCreateRoom = async () => {
+    setUser(
+      new UserImpl({
+        id: uuid().toString(),
+        name: "test",
+        isReady: false,
+      })
+    );
+    if (user) {
+      const newRoom = new RoomImpl({
+        id: uuid().toString(),
+        users: [user],
+        word: words,
+        totalTime: totalTime,
+      });
+      console.log(`Creating room with user: ${user} and room: ${newRoom}`);
+
+      const room: Room | void = await createRoomFn(newRoom, user);
+      if (room) {
+        navigator("/online", {
+          state: {
+            room,
+            user,
+          },
+        });
+      }
+    }
+  };
 
   return (
     <div className="grid gap-10">
@@ -63,13 +99,56 @@ const HomePage = () => {
         wordCount={calculateWords()}
         className={``}
       />
+      <button onClick={handelCreateRoom}>Create Room</button>
+
+      {/* Modified Input with ref and focused state handling */}
+      <div className="relative">
+        <Input
+          ref={roomIdInputRef}
+          onChange={(e) => {
+            setRoomId(e.target.value);
+          }}
+          placeholder="Enter Room ID"
+          // Add event handlers to temporarily disable keyboard capture
+          onFocus={() => {
+            // Set a flag in localStorage that input is focused
+            localStorage.setItem("inputFocused", "true");
+          }}
+          onBlur={() => {
+            // Remove the flag when input loses focus
+            localStorage.removeItem("inputFocused");
+          }}
+        />
+      </div>
+
       <button
         onClick={async () => {
-          setUser(new UserImpl({ id: uuid().toString(), name: "test" }));
-          await createRoomFn(roomName, user!);
+          const user = new UserImpl({
+            id: uuid().toString(),
+            name: "user1",
+            isReady: false,
+          });
+          if (roomId && user) {
+            const room: Room | void = await joinRoomFn(roomId, user);
+
+            if (room) {
+              try {
+                navigator("/online", {
+                  state: {
+                    room,
+                    user,
+                  },
+                });
+              } catch (error) {
+                console.error(error);
+                const socket = getInitilizedSocket();
+                socket?.emit("room:leave", { roomId: room.id, user: user });
+              }
+            }
+          }
         }}
       >
-        Create Room
+        Join Room
       </button>
     </div>
   );

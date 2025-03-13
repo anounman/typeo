@@ -1,4 +1,4 @@
-import { Room as RoomInterface, User as UserInterface } from './type';
+import { Room as RoomInterface, User, User as UserInterface } from './type';
 
 /**
  * User class with constructor for creating user objects
@@ -18,7 +18,7 @@ export class UserImpl implements UserInterface {
         socketId = '',
         input = '',
         isReady = false,
-        isDone,
+        isDone = false,
         wpm
     }: {
         id: string;
@@ -67,42 +67,50 @@ export class UserImpl implements UserInterface {
  */
 export class RoomImpl implements RoomInterface {
     id: string;
-    users: UserImpl[];
+    users: User[];
     isActive: boolean;
     createdAt: Date;
     startedAt?: Date;
+    word: string;
+    totalTime: number;
 
     constructor({
         id,
         users = [],
         isActive = false,
         createdAt = new Date(),
-        startedAt
+        startedAt,
+        word,
+        totalTime,
     }: {
         id: string;
-        users?: UserImpl[];
+        users?: User[];
         isActive?: boolean;
         createdAt?: Date;
         startedAt?: Date;
+        word: string;
+        totalTime: number;
     }) {
         this.id = id;
         this.users = users;
         this.isActive = isActive;
         this.createdAt = createdAt;
         this.startedAt = startedAt;
+        this.word = word;
+        this.totalTime = totalTime;
     }
 
     /**
      * Create a new empty room
      */
-    static create(id: string): RoomImpl {
-        return new RoomImpl({ id, createdAt: new Date() });
+    static create(id: string, word: string, totalTime: number): RoomImpl {
+        return new RoomImpl({ id, createdAt: new Date(), word: word, totalTime: totalTime });
     }
 
     /**
      * Add a user to the room
      */
-    addUser(user: UserImpl): void {
+    addUser(user: User): void {
         // Check if user is already in the room
         if (!this.users.some(u => u.id === user.id)) {
             this.users.push(user);

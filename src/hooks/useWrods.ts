@@ -4,13 +4,13 @@ import { useState, useCallback } from "react";
 
 
 
-
-export const useWords = (wordsCount: number) => {
-    const [words, setWords] = useState<string>(generateWords(wordsCount));
+// nedd to pass one of thoes two values
+export const useWords = (wordsCount: number, initialWords?: string) => {
+    const [words, setWords] = useState<string>(initialWords ?? generateWords(wordsCount));
 
     const updateWords = useCallback(() => {
-        setWords(generateWords(wordsCount));
-    }, [wordsCount]);
+        setWords(initialWords ?? generateWords(wordsCount));
+    }, [wordsCount, initialWords]);
 
     const updateGeneratedWords = useCallback((newWords: string) => {
         setWords((prev) => prev + " " + newWords);

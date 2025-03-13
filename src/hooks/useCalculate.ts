@@ -14,23 +14,21 @@ export const useCalculate = (input: string, originalWrod: string, total_time: nu
 
 
     const calculateAccuracy = useCallback(() => {
-        let count: number = 0;
-        console.log(`input length : ${input.length}`);
-
-        input.split("").map((word, index) => {
-            if (word === originalWrod.split("")[index]) {
-                count++;
-            }
-        });
-        const result = (count / input.length) * 100;
-        return Number.isNaN(result) ? 0 : result;
+        let correct = 0;
+        for (let i = 0; i < input.length; i++) {
+            if (input[i] === originalWrod[i]) correct++;
+        }
+        return input.length > 0 ? (correct / input.length) * 100 : 100;
     }, [input, originalWrod]);
 
 
     const calculateWPM = useCallback(() => {
-        const totalAvgWords = (input.length / 5) * 60 / total_time;
+        // Standard calculation: 5 characters = 1 word
+        const elapsedMinutes = (total_time - (total_time - 1)) / 60; // Approximate time typing
+        if (elapsedMinutes <= 0) return 0;
 
-        return Number.isNaN(totalAvgWords) ? 0 : totalAvgWords;
+        const wordsTyped = input.length / 5;
+        return wordsTyped / Math.max(0.01, elapsedMinutes); // Avoid division by zero
     }, [input, total_time]);
     const calculateRawWords = useCallback(() => {
         let count: number = 0;
@@ -45,11 +43,11 @@ export const useCalculate = (input: string, originalWrod: string, total_time: nu
 
     const calculateTheErros = useCallback(() => {
         let count: number = 0;
-        input.split("").map((word, index) => {
-            if (word !== originalWrod.split("")[index]) {
+        for (let index = 0; index < input.length; index++) {
+            if (input[index] !== originalWrod[index]) {
                 count++;
             }
-        });
+        }
         return count;
     }, [input, originalWrod]);
 

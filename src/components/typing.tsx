@@ -4,14 +4,14 @@ export const Typing = ({
   words,
   className,
   input,
-  
+  cursorColor,
 }: {
   words: string;
   className?: string;
   input: string;
+  cursorColor?: string;
 }) => {
   return (
-    
     <div className={`${className}`}>
       {input.split("").map((_char, index) => {
         return (
@@ -20,7 +20,7 @@ export const Typing = ({
           </span>
         );
       })}
-      <Cursor />
+      <Cursor color={cursorColor}/>
     </div>
   );
 };

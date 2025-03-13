@@ -4,7 +4,7 @@ import { HttpMethod } from '@/utils/config';
 import { FetchApi } from '@/utils/fetchApi';
 
 // Socket connection management
-let socket: Socket | null = null;
+export let socket: Socket | null = null;
 
 // Initialize socket connection
 export const initializeSocket = (serverUrl: string = import.meta.env.VITE_API_URL): Socket => {
@@ -23,7 +23,7 @@ export const initializeSocket = (serverUrl: string = import.meta.env.VITE_API_UR
     socket.on('connect_error', (error) => {
       console.error('Connection error:', error);
     });
-  } 
+  }
 
   return socket;
 };
@@ -56,6 +56,8 @@ export const joinRoom = (roomId: string, user: Omit<User, 'socketId'>): Promise<
     // Set up a one-time listener for the response
     socket.once('room:joined', ({ room }: { room: Room }) => {
       resolve(room);
+      console.log('Room joined:', room);
+
     });
 
     socket.once('room:join_error', ({ message }: { message: string }) => {
@@ -69,10 +71,14 @@ export const joinRoom = (roomId: string, user: Omit<User, 'socketId'>): Promise<
   });
 };
 
-export const createRoom = async (roomName: string , user: Omit<User ,  'socketId'>): Promise<Room | void> => {
+export const createRoom = async (room: Room, user: Omit<User, 'socketId'>): Promise<Room | void> => {
 
-  const req = new FetchApi().request;
-  const response   = await req<Room | null>(HttpMethod.POST, '/rooms', { name: roomName });
+  const req = new FetchApi();
+  const response = await req.request<Room | null>({
+    method: HttpMethod.POST,
+    path: 'rooms',
+    data: { "room": room },
+  });
 
   if (!response) {
     throw new Error('Failed to create room');
@@ -142,18 +148,55 @@ export const markAsReady = (roomId: string, userId: string): Promise<Room | void
   });
 };
 
+
+// update the room when we chang the room on room:update
+export const updateRoom = (room: Room): Promise<Room | void> => {
+  return new Promise<Room | void>((resolve, reject) => {
+    initializeSocket();
+    if (!socket) {
+      reject(new Error('Socket not initialized'));
+      return;
+    }
+
+    socket.emit('room:update', { room });
+
+
+    // Set up a one-time listener for the response
+    socket.once('room:update_data', ({ room }: { room: Room }) => {
+      resolve(room);
+    });
+
+    socket.once('room:update_error', ({ message }: { message: string }) => {
+      reject(new Error(message));
+    });
+
+    // Timeout for response
+    setTimeout(() => {
+      reject(new Error('Room update timed out'));
+    }, 5000);
+  });
+}
+
 // Set up event listeners for room events (user joined, user left, etc.)
-export const setupRoomEventListeners = (callbacks: {
-  onUserJoined?: (room: Room, user: User) => void;
-  onUserLeft?: (room: Room, userId: string) => void;
-  onRaceStart?: (room: Room) => void;
-}): void => {
-  initializeSocket();
+export const setupRoomEventListeners = (
+  callbacks: {
+    onUserJoined?: (room: Room, user: User) => void;
+    onUserLeft?: (room: Room, userId: string) => void;
+    onRaceStart?: (room: Room) => void;
+    onUserReady?: (room: Room, userId: string) => void;
+    onRoomUpdate?: (room: Room) => void;
+  }): void => {
+  if (!socket) initializeSocket();
   if (!socket) return;
 
   if (callbacks.onUserJoined) {
     socket.on('room:user_joined', ({ room, user }: { room: Room, user: User }) => {
       callbacks.onUserJoined?.(room, user);
+    });
+  }
+  if (callbacks.onUserReady) {
+    socket.on('room:user_ready', ({ room, userId }: { room: Room, userId: string }) => {
+      callbacks.onUserReady?.(room, userId);
     });
   }
 
@@ -166,6 +209,12 @@ export const setupRoomEventListeners = (callbacks: {
   if (callbacks.onRaceStart) {
     socket.on('room:race_start', ({ room }: { room: Room }) => {
       callbacks.onRaceStart?.(room);
+    });
+  }
+  if (callbacks.onRoomUpdate) {
+    socket.on('room:update_data', ({ room }: { room: Room }) => {
+      console.log('room updated');
+      callbacks.onRoomUpdate?.(room);
     });
   }
 };

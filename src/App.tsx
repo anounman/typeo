@@ -5,6 +5,7 @@ import { ThemeProvider } from "./components/theme-provider";
 import HomePage from "./pages/home-page";
 import ResultPage from "./pages/result-page";
 import { InputProvider } from "./components/input-provider";
+import MultiPlayerPage from "./pages/multiplayer-page";
 
 function App() {
   const router = createBrowserRouter([
@@ -18,6 +19,10 @@ function App() {
         {
           path: "/result",
           element: <ResultPage />,
+        },
+        {
+          path: "/online",
+          element: <MultiPlayerPage />,
         },
       ],
     },
