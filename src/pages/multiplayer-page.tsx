@@ -3,7 +3,7 @@ import { GeneratedText } from "@/components/ui/generated-text";
 import Time from "@/components/ui/time";
 import { Room, User } from "@/types/type";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Crown } from "lucide-react";
+import { Crown, Users, Code, Clock } from "lucide-react";
 import useSocket from "@/hooks/useSocket";
 import {
   cleanupRoomEventListeners,
@@ -110,49 +110,76 @@ const MultiPlayerPage = () => {
       sendTypingProgress(room.id, updatedUser);
     }
   }, [input, room.isActive, currentUser, room?.id, timeLeft, totalTime]);
+  
+  const isCurrentUserReady = room?.users.find((user) => user.id === currentUser.id)?.isReady || false;
 
   return (
-    <div className="grid gap-10">
-      <div className="flex flex-col justify-center">
-        <div className="flex flex-col justify-center items-start py-5">
-          <div className="text-1xl text-center">
-            Join Code:{" "}
-            <span className="text-bold text-slate-500">{room?.id}</span>
+    <div className="max-w-6xl mx-auto px-4 py-6">
+      {/* Room info header */}
+      <div className="bg-slate-800/60 rounded-lg p-4 mb-6 shadow-lg border border-slate-700">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-3">
+          <div className="flex items-center gap-2 text-yellow-500 mb-2 md:mb-0">
+            <Code size={18} />
+            <h2 className="font-medium">Room Code: <span className="text-slate-300 font-mono">{room?.id}</span></h2>
           </div>
-          <div className=" flex flex-col text-1xl items-start">
-            Users{" "}
-            <span className="text-bold text-slate-500">
-              {room?.users.map((user: User) => (
-                <div
-                  className="flex flex-row text-center justify-center items-center gap-1"
-                  key={user.id}
-                >
-                  <div className="items-center ">{user.name} </div>
-                  <span className="">
-                    {user?.isOwner ? (
-                      <span>
-                        <Crown size={20} color="#ffd500" />
-                      </span>
-                    ) : (
-                      <span></span>
-                    )}{" "}
-                  </span>{" "}
-                  <div className="text-green-500 text-sm items-center">
+          
+          <div className="flex items-center gap-3">
+            <Clock size={16} className="text-slate-400" />
+            <Time 
+              totalTime={totalTime} 
+              setTotalTime={setTotalTime}
+            />
+          </div>
+        </div>
+          
+        {/* User list */}
+        <div className="mt-3">
+          <div className="flex items-center gap-1 text-slate-300 mb-2">
+            <Users size={16} /> 
+            <span className="text-sm font-medium">Players ({room?.users.length})</span>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {room?.users.map((user: User) => (
+              <div
+                key={user.id}
+                className={`flex items-center gap-2 p-2 rounded-md ${
+                  user.id === currentUser.id ? "bg-slate-700/70" : "bg-slate-800/30"
+                }`}
+              >
+                <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                <div className="font-medium">{user.name}</div>
+                {user?.isOwner && (
+                  <Crown size={14} className="text-yellow-500 ml-1" />
+                )}
+                <div className="ml-auto">
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded-full ${
+                      user.isReady
+                        ? "bg-green-500/20 text-green-400"
+                        : "bg-slate-700 text-slate-400"
+                    }`}
+                  >
                     {user.isReady ? "Ready" : "Not Ready"}
-                  </div>
+                  </span>
                 </div>
-              ))}
-            </span>
+              </div>
+            ))}
           </div>
         </div>
-        <div className="flex justify-between">
-          <CoundownTimer timeLeft={timeLeft} />
-          <Time totalTime={totalTime} setTotalTime={setTotalTime} />
-        </div>
+      </div>
+
+      {/* Countdown Timer */}
+      <div className="mb-4">
+        <CoundownTimer timeLeft={timeLeft} />
+      </div>
+
+      {/* Typing Area */}
+      <div className="relative bg-slate-800/40 rounded-lg p-6 shadow-lg border border-slate-700/50 mb-6">
         <div className="relative max-w-4xl mt-3 break-all">
           <GeneratedText words={words} />
           {room?.users.map((user) => (
-            <>
+            <div key={user.id}>
               {user.id === currentUser.id ? (
                 <div className="absolute inset-0 text-4xl">
                   {input.split("").map((_char, index) => {
@@ -170,7 +197,7 @@ const MultiPlayerPage = () => {
                 </div>
               ) : (
                 <div className="absolute inset-0 text-4xl">
-                  {user.input.split("").map((char, index) => {
+                  {user.input?.split("").map((char, index) => {
                     return (
                       <span
                         id={char.toString()}
@@ -181,38 +208,29 @@ const MultiPlayerPage = () => {
                       </span>
                     );
                   })}
-
                   <Cursor color="bg-green-500" />
                 </div>
               )}
-            </>
+            </div>
           ))}
         </div>
       </div>
-      {room?.users.find((prevUser) => prevUser.id === currentUser.id)
-        ?.isReady ? (
-        <div className="flex justify-center items-center text-green-500 ">
-          <button
-            onClick={() => {
-              fnMarkReady(room?.id, currentUser.id);
-            }}
-          >
-            Ready
-          </button>
-        </div>
-      ) : (
-        <div className="flex justify-center items-center text-red-500">
-          <button
-            onClick={async () => {
-              console.log(`Room ID: ${room?.id}, User ID: ${currentUser?.id}`);
-              fnMarkReady(room!.id, currentUser.id);
-              // if (updatedRoom) setRoom(updatedRoom);
-            }}
-          >
-            No Ready
-          </button>
-        </div>
-      )}
+
+      {/* Ready Button */}
+      <div className="flex justify-center">
+        <button
+          onClick={() => {
+            fnMarkReady(room?.id, currentUser.id);
+          }}
+          className={`px-8 py-3 rounded-full font-medium transition-all duration-300 text-center min-w-[120px] ${
+            isCurrentUserReady 
+              ? "bg-green-500/20 text-green-400 border border-green-500/30 hover:bg-green-500/30" 
+              : "bg-yellow-500 text-slate-900 hover:bg-yellow-400"
+          }`}
+        >
+          {isCurrentUserReady ? "Ready" : "Ready Up!"}
+        </button>
+      </div>
     </div>
   );
 };
