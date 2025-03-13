@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useType } from "./useType";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useInputContext } from "../components/input-provider";
 import { Socket } from "socket.io-client";
@@ -9,15 +8,14 @@ import { useWords } from "./useWrods";
 import { Room } from "@/types/type";
 
 
-export const useOnlineEngine = ({ room, setRoom, setWord  , updateRoomFn}: { room: Room, setRoom: React.Dispatch<React.SetStateAction<Room>>, setWord: React.Dispatch<React.SetStateAction<string>>, updateRoomFn: (room: Room) => Promise<void | Room> }) => {
+export const useOnlineEngine = ({ room, setRoom, setWord, raceStart }: { raceStart: boolean, room: Room, setRoom: React.Dispatch<React.SetStateAction<Room>>, setWord: React.Dispatch<React.SetStateAction<string>> }) => {
     const [totalTime, setTotalTime] = useState(room.totalTime);
     const { input, setInput } = useInputContext();
-    const { words, updateWords, updateGeneratedWords } = useWords(0, room.word);
+    const { words, updateGeneratedWords } = useWords(0, room.word);
 
     const { setTimeLeft,
-        calculateWPM, calculateAccuracy, calculateWords, handelTyping, timeLeft, resetCountdown, setIsTyping
-    } = useType(words, totalTime, updateGeneratedWords, setRoom , updateRoomFn);
-    const navigate = useNavigate();
+        calculateWPM, calculateAccuracy, calculateWords, handelTyping, timeLeft, setIsTyping, startCountdown
+    } = useType(words, totalTime, updateGeneratedWords, setRoom, raceStart);
     const socketInstance = getSocket();
     const [socket, setSocket] = useState<Socket | null>(socketInstance);
 
@@ -28,33 +26,30 @@ export const useOnlineEngine = ({ room, setRoom, setWord  , updateRoomFn}: { roo
 
     useEffect(() => {
         setWord(words);
-    }, [words, setWord])
-
-
-
-
-    // Reset countdown when totalTime changes
+        setRoom((prev) => {
+            const newRoom = prev;
+            newRoom.word = words;
+            return newRoom;
+        });
+    }, [words, setWord, setRoom])
     useEffect(() => {
-        resetCountdown();
-        setTimeLeft(totalTime);
-    }, [totalTime, resetCountdown, setTimeLeft]);
+        if (raceStart) {
+            startCountdown();
+        }
+    }, [raceStart, startCountdown])
+
+
+
+
 
     useEffect(() => {
         setSocket(socketInstance);
     }, [socketInstance]);
-    const restart = () => {
-        const url = window.location.pathname;
-        if (url !== '/') {
-            navigate('/');
-        }
-        updateWords();
-        setInput('');
-        resetCountdown();
-        setIsTyping(true);
-    }
+
 
 
     useEffect(() => {
+        window.removeEventListener("keydown", handelTyping);
         window.addEventListener("keydown", handelTyping);
         return () => {
             window.removeEventListener("keydown", handelTyping);
@@ -65,5 +60,5 @@ export const useOnlineEngine = ({ room, setRoom, setWord  , updateRoomFn}: { roo
         setIsTyping(room.isActive);
     }, [room.isActive, setIsTyping]);
 
-    return { calculateAccuracy, words, restart, input, setInput, timeLeft, calculateWords, calculateWPM, setTimeLeft, setTotalTime, totalTime, handelTyping, socket, getInitilizedSocket };
+    return { calculateAccuracy, words, input, setInput, timeLeft, calculateWords, calculateWPM, setTimeLeft, setTotalTime, totalTime, handelTyping, socket, getInitilizedSocket };
 };

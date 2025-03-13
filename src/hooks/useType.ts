@@ -12,7 +12,8 @@ export const useType = (
   time: number,
   updateGeneratedWords: (newWords: string) => void,
   setRoom?: React.Dispatch<React.SetStateAction<Room>>,
-  updateRoomFn?: (room: Room) => Promise<void | Room>
+  // updateRoomFn?: (room: Room) => Promise<void | Room>,
+  isActive: boolean = true
 ) => {
   const { input, setInput } = useInputContext();
   const [newTime, setNewTime] = useState<number>(time);
@@ -22,26 +23,31 @@ export const useType = (
   const navigate = useNavigate();
 
   const handelTyping = useCallback((e: KeyboardEvent) => {
+    // Check if an input field is focused
+    const inputFocused = localStorage.getItem('inputFocused') === 'true';
+    const isInputElement = document.activeElement?.tagName === 'INPUT' ||
+      document.activeElement?.tagName === 'TEXTAREA';
+
+    // Skip handling if we're typing in an input field
+    if (inputFocused || isInputElement) {
+      return;
+    }
+
+    // Proceed with normal typing game logic
     e.preventDefault();
-    if (e.key === words.split("")[0]) {
+    if (e.key === words.split("")[0] && isActive) {
       startCountdown();
     }
+
     if (isTyping) {
       formateInput(e, setInput, isTyping);
     }
-  }, [isTyping, words, startCountdown, setInput]);
+  }, [isTyping, words, startCountdown, setInput, isActive]);
 
+  //update the time
   useEffect(() => {
     setNewTime(time);
-    if (setRoom) {
-      setRoom((prev) => {
-        const newRoom: Room = prev;
-        newRoom.totalTime = time;
-        if (updateRoomFn) updateRoomFn(newRoom);
-        return newRoom;
-      });
-    }
-  }, [time, setRoom, updateRoomFn]);
+  }, [time, setRoom]);
 
   // Check if user is approaching the end of words and add more
   useEffect(() => {
@@ -51,7 +57,7 @@ export const useType = (
       if (setRoom) {
         setRoom((prev) => {
           const newRoom: Room = prev;
-          newRoom.word = newRoom.word + " " + newWords;
+          newRoom.word = words;
           console.log(`Room updated localy new room ${newRoom}`);
           return newRoom;
         });
@@ -59,6 +65,7 @@ export const useType = (
     }
   }, [input, words, timeLeft, updateGeneratedWords, setRoom]);
 
+  //check if the input is correct or not
   useEffect(() => {
     const wordsArray: Array<string> = words.split("");
     const inputArray: Array<string> = input.split("");
@@ -82,15 +89,16 @@ export const useType = (
   useEffect(() => {
     if (timeLeft === 0) {
       setIsTyping(false);
-      navigate('/result', {
-        state: {
-          wpm: calculateWPM().toFixed(0),
-          accuracy: calculateAccuracy().toFixed(0),
-          words: calculateRawWords().toFixed(0),
-          characters: input.length,
-          totalTime: newTime,
-        }
-      });
+      // TODO: must uncomment this line
+      // navigate('/result', {
+      //   state: {
+      //     wpm: calculateWPM().toFixed(0),
+      //     accuracy: calculateAccuracy().toFixed(0),
+      //     words: calculateRawWords().toFixed(0),
+      //     characters: input.length,
+      //     totalTime: newTime,
+      //   }
+      // });
     }
   }, [newTime, isTyping, timeLeft, navigate, calculateWPM, calculateAccuracy, calculateWords, calculateRawWords, input]);
 

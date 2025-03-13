@@ -111,7 +111,6 @@ const HomePage = () => {
           placeholder="Enter Room ID"
           // Add event handlers to temporarily disable keyboard capture
           onFocus={() => {
-            // Set a flag in localStorage that input is focused
             localStorage.setItem("inputFocused", "true");
           }}
           onBlur={() => {

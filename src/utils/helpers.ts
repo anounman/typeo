@@ -1,5 +1,15 @@
 
 export const formateInput = (e: KeyboardEvent, setInput: React.Dispatch<React.SetStateAction<string>>, isRunning: boolean) => {
+  // Check if an input field is focused
+  const inputFocused = localStorage.getItem('inputFocused') === 'true';
+  const isInputElement = document.activeElement?.tagName === 'INPUT' ||
+    document.activeElement?.tagName === 'TEXTAREA';
+
+  if (inputFocused || isInputElement) {
+    return; // Skip handling when input is focused
+  }
+
+  // Regular typing game logic
   if (isRunning && e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey && e.key !== 'Shift') {
     setInput((prev: string) => prev + e.key);
   }

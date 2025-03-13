@@ -12,9 +12,9 @@ export const useWords = (wordsCount: number, initialWords?: string) => {
         setWords(initialWords ?? generateWords(wordsCount));
     }, [wordsCount, initialWords]);
 
-    const updateGeneratedWords = useCallback((newWords: string) => {
+    const updateGeneratedWords = (newWords: string) => {
         setWords((prev) => prev + " " + newWords);
-    }, []);
+    };
 
     return { words, updateWords, updateGeneratedWords };
 };

@@ -7,51 +7,48 @@ import { Crown } from "lucide-react";
 import useSocket from "@/hooks/useSocket";
 import {
   cleanupRoomEventListeners,
-  leaveRoom,
   markAsReady,
   setupRoomEventListeners,
   updateRoom,
 } from "@/api/room-socket";
 import { useEffect, useState } from "react";
-import {
-  cleanupUserEventListeners,
-  setupUserEventListener,
-} from "@/api/user-socket";
-import { sendTypingProgress } from "@/api/user-socket";
 import Cursor from "@/components/ui/cursor";
 import { useOnlineEngine } from "@/hooks/useOnlineEngine";
+import { sendTypingProgress, setupUserEventListener } from "@/api/user-socket";
 
 const MultiPlayerPage = () => {
   const location = useLocation();
-  const [room, setRoom] = useState<Room>(location.state.room);
-  const { fn: fnMarkReady } = useSocket(markAsReady);
-  // const [room, setRoom] = useState<Room | null>(location.state.room);
-  const [currentUser] = useState<User>(location.state.user);
   const navigator = useNavigate();
-  const [words, setWord] = useState<string>(room?.word ?? "");
+
+  const [room, setRoom] = useState<Room>(location.state.room);
+  const [words, setWord] = useState<string>(room.word);
+  const [currentUser] = useState<User>(location.state.user);
+  const [raceStart, setRaceStart] = useState<boolean>(false);
+
+  const { fn: fnMarkReady } = useSocket(markAsReady);
   const { fn: updateRoomFn } = useSocket(updateRoom);
 
   const { input, timeLeft, totalTime, setTotalTime } = useOnlineEngine({
-    room: room!,
+    room: room,
     setRoom: setRoom,
     setWord: setWord,
-    updateRoomFn: updateRoomFn,
+    raceStart: raceStart,
   });
 
-  // Set up socket event listeners
-
+  //if the room is null navigate to home page
   useEffect(() => {
     if (room) {
+      updateRoomFn(room);
       setWord(room.word);
     } else {
       navigator("/");
     }
-  }, [room, navigator]);
+  }, [room, navigator, updateRoomFn]);
 
-  // room handeling
+  // setup room socket event handeler
   useEffect(() => {
     // Define callbacks for room events
-    const callbacks = {
+    const roomCallbacks = {
       onUserJoined: (updatedRoom: Room, newUser: User) => {
         console.log(`User joined: ${newUser.name}`);
         setRoom(updatedRoom);
@@ -64,57 +61,16 @@ const MultiPlayerPage = () => {
 
       onRaceStart: (updatedRoom: Room) => {
         console.log("Race started!");
-        setRoom({ ...updatedRoom, isActive: true });
+        setRaceStart(true);
+        setRoom(updatedRoom);
       },
       onUserReady: (updatedRoom: Room, userId: string) => {
         console.log(`User Ready: ${userId}`);
         setRoom(updatedRoom);
       },
-      // onRoomUpdate: (updatedRoom: Room) => {
-      //   // console.log(`Room updated data: ${updatedRoom.totalTime}`);
-      //   setRoom(updatedRoom);
-      // },
     };
 
-    // Set up the event listeners
-    setupRoomEventListeners(callbacks);
-
-    // Clean up on unmount
-    return () => {
-      cleanupRoomEventListeners();
-    };
-  }, []);
-  useEffect(() => {
-    // Handle browser close or page navigation
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (room && currentUser) {
-        leaveRoom(room?.id, currentUser.id);
-      }
-      // Standard code to show confirmation dialog
-      e.preventDefault();
-
-      //redirect to home page
-      navigator("/");
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [room, currentUser, navigator]);
-  useEffect(() => {
-    if (room === null) {
-      navigator("/");
-    }
-  }, [room, navigator]);
-  useEffect(() => {
-    console.log(
-      "Setting up user typing listener, room active:",
-      room?.isActive
-    );
-
-    const callBacks = {
+    const userCallBacks = {
       onUserType: (updatedRoom: Room) => {
         if (updatedRoom.id === room?.id) {
           setRoom(updatedRoom);
@@ -126,18 +82,19 @@ const MultiPlayerPage = () => {
       },
     };
 
-    // Call the function outside the object definition
-    setupUserEventListener(callBacks);
+    // Set up the event listeners
+    setupRoomEventListeners(roomCallbacks);
+    setupUserEventListener(userCallBacks);
 
+    // Clean up on unmount
     return () => {
-      console.log("Cleaning up user typing listener");
-      cleanupUserEventListeners();
+      cleanupRoomEventListeners();
     };
-  }, [room, currentUser?.id, input]);
+  }, [raceStart, room?.id]);
 
-  // Add this effect to watch for input changes
+  // // Add this effect to watch for input changes
   useEffect(() => {
-    if (room?.isActive && currentUser) {
+    if (room.isActive && currentUser) {
       // Calculate WPM
       const wpm = input.length / 5 / ((totalTime - timeLeft) / 60);
       const adjustedWpm = isNaN(wpm) || !isFinite(wpm) ? 0 : wpm;
@@ -152,7 +109,7 @@ const MultiPlayerPage = () => {
       // Send the typing progress
       sendTypingProgress(room.id, updatedUser);
     }
-  }, [input, room?.isActive, currentUser, room?.id, timeLeft, totalTime]);
+  }, [input, room.isActive, currentUser, room?.id, timeLeft, totalTime]);
 
   return (
     <div className="grid gap-10">
