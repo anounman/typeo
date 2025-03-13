@@ -1,9 +1,8 @@
 import { CoundownTimer } from "@/components/ui/countdown-timer";
 import { GeneratedText } from "@/components/ui/generated-text";
-import Time from "@/components/ui/time";
 import { Room, User } from "@/types/type";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Crown, Users, Code, Clock } from "lucide-react";
+import { Crown, Users, Code, Clock, Copy, Check } from "lucide-react"; // Added Copy and Check icons
 import useSocket from "@/hooks/useSocket";
 import {
   cleanupRoomEventListeners,
@@ -24,18 +23,26 @@ const MultiPlayerPage = () => {
   const [words, setWord] = useState<string>(room.word);
   const [currentUser] = useState<User>(location.state.user);
   const [raceStart, setRaceStart] = useState<boolean>(false);
+  const [copied, setCopied] = useState<boolean>(false); // New state for copy feedback
 
   const { fn: fnMarkReady } = useSocket(markAsReady);
   const { fn: updateRoomFn } = useSocket(updateRoom);
 
-  const { input, timeLeft, totalTime, setTotalTime } = useOnlineEngine({
+  const { input, timeLeft, totalTime } = useOnlineEngine({
     room: room,
     setRoom: setRoom,
     setWord: setWord,
     raceStart: raceStart,
   });
+  
+  // Copy room code to clipboard
+  const copyRoomCode = () => {
+    navigator.clipboard.writeText(room.id);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000); // Reset after 2 seconds
+  };
 
-  //if the room is null navigate to home page
+  // if the room is null navigate to home page
   useEffect(() => {
     if (room) {
       updateRoomFn(room);
@@ -92,7 +99,7 @@ const MultiPlayerPage = () => {
     };
   }, [raceStart, room?.id]);
 
-  // // Add this effect to watch for input changes
+  // Add this effect to watch for input changes
   useEffect(() => {
     if (room.isActive && currentUser) {
       // Calculate WPM
@@ -120,15 +127,26 @@ const MultiPlayerPage = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-3">
           <div className="flex items-center gap-2 text-yellow-500 mb-2 md:mb-0">
             <Code size={18} />
-            <h2 className="font-medium">Room Code: <span className="text-slate-300 font-mono">{room?.id}</span></h2>
+            <h2 className="font-medium">Room Code: 
+              <span className="text-slate-300 font-mono ml-2">{room?.id}</span>
+              <button 
+                onClick={copyRoomCode}
+                className="ml-2 p-1 rounded-md hover:bg-slate-700/70 transition-colors"
+                aria-label="Copy room code"
+                title="Copy room code"
+              >
+                {copied ? (
+                  <Check size={14} className="text-green-500" />
+                ) : (
+                  <Copy size={14} className="text-slate-400" />
+                )}
+              </button>
+            </h2>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 px-3 py-1 rounded-md bg-slate-700/50">
             <Clock size={16} className="text-slate-400" />
-            <Time 
-              totalTime={totalTime} 
-              setTotalTime={setTotalTime}
-            />
+            <span className="text-slate-300">{totalTime} seconds</span>
           </div>
         </div>
           
