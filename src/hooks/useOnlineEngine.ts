@@ -5,34 +5,36 @@ import { useInputContext } from "../components/input-provider";
 import { Socket } from "socket.io-client";
 import { getSocket } from "@/api/room-socket";
 import { useWords } from "./useWrods";
-import { Room } from "@/types/type";
+import { Room, User } from "@/types/type";
 
-export const useOnlineEngine = ({ 
-  room, 
-  setRoom, 
-  setWord, 
-  raceStart 
-}: { 
-  raceStart: boolean, 
-  room: Room, 
-  setRoom: React.Dispatch<React.SetStateAction<Room>>, 
-  setWord: React.Dispatch<React.SetStateAction<string>> 
+export const useOnlineEngine = ({
+    room,
+    setRoom,
+    setWord,
+    raceStart,
+    user
+}: {
+    raceStart: boolean,
+    room: Room,
+    setRoom: React.Dispatch<React.SetStateAction<Room>>,
+    setWord: React.Dispatch<React.SetStateAction<string>>,
+    user : User
 }) => {
     const [totalTime, setTotalTime] = useState(room.totalTime);
     const { input, setInput } = useInputContext();
     const { words, updateGeneratedWords } = useWords(0, room.word);
 
-    const { 
+    const {
         setTimeLeft,
-        calculateWPM, 
-        calculateAccuracy, 
-        calculateWords, 
-        handelTyping, 
-        timeLeft, 
-        setIsTyping, 
-        startCountdown 
-    } = useType(words, totalTime, updateGeneratedWords, setRoom, raceStart, room, true);
-    
+        calculateWPM,
+        calculateAccuracy,
+        calculateWords,
+        handelTyping,
+        timeLeft,
+        setIsTyping,
+        startCountdown
+    } = useType(words, totalTime, updateGeneratedWords, setRoom, raceStart, room, true , user.id);
+
     const socketInstance = getSocket();
     const [socket, setSocket] = useState<Socket | null>(socketInstance);
 
@@ -40,16 +42,16 @@ export const useOnlineEngine = ({
     useEffect(() => {
         // Clear any previous input
         setInput("");
-        
+
         // Reset other state if needed
         setTimeLeft(totalTime);
         setIsTyping(false);
-        
+
         // Return cleanup function to clear input when component unmounts
         return () => {
             setInput("");
         };
-    }, []); 
+    },  []);
 
     const getInitilizedSocket = () => {
         setSocket(socketInstance);
@@ -87,19 +89,19 @@ export const useOnlineEngine = ({
         setIsTyping(room.isActive);
     }, [room.isActive, setIsTyping]);
 
-    return { 
-        calculateAccuracy, 
-        words, 
-        input, 
-        setInput, 
-        timeLeft, 
-        calculateWords, 
-        calculateWPM, 
-        setTimeLeft, 
-        setTotalTime, 
-        totalTime, 
-        handelTyping, 
-        socket, 
-        getInitilizedSocket 
+    return {
+        calculateAccuracy,
+        words,
+        input,
+        setInput,
+        timeLeft,
+        calculateWords,
+        calculateWPM,
+        setTimeLeft,
+        setTotalTime,
+        totalTime,
+        handelTyping,
+        socket,
+        getInitilizedSocket
     };
 };

@@ -2,7 +2,7 @@ import { CoundownTimer } from "@/components/ui/countdown-timer";
 import { GeneratedText } from "@/components/ui/generated-text";
 import { Room, User } from "@/types/type";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Crown, Users, Code, Clock, Copy, Check } from "lucide-react";
+import { Crown, Users, Code, Clock, Copy, Check, Home } from "lucide-react";
 import useSocket from "@/hooks/useSocket";
 import {
   cleanupRoomEventListeners,
@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import Cursor from "@/components/ui/cursor";
 import { useOnlineEngine } from "@/hooks/useOnlineEngine";
 import { sendTypingProgress, setupUserEventListener } from "@/api/user-socket";
+import { ReadyConfirmAlert } from "@/components/ui/ready-confirm-alret";
 
 const MultiPlayerPage = () => {
   const location = useLocation();
@@ -24,6 +25,9 @@ const MultiPlayerPage = () => {
   const [currentUser] = useState<User>(location.state.user);
   const [raceStart, setRaceStart] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
+
+  // Alert state
+  const [showReadyAlert, setShowReadyAlert] = useState<boolean>(false);
 
   // Countdown state
   const [showCountdown, setShowCountdown] = useState(false);
@@ -37,7 +41,14 @@ const MultiPlayerPage = () => {
     setRoom: setRoom,
     setWord: setWord,
     raceStart: raceStart,
+    user: currentUser,
   });
+
+  // Handle ready confirmation
+  const handleReadyConfirm = () => {
+    fnMarkReady(room?.id, currentUser.id);
+    setShowReadyAlert(false);
+  };
 
   // Copy room code to clipboard
   const copyRoomCode = async () => {
@@ -46,7 +57,7 @@ const MultiPlayerPage = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // If the room is null navigate to home page
+  // If the room is null navigate to home page otherwise whenever the room changes update the room
   useEffect(() => {
     if (room) {
       updateRoomFn(room);
@@ -167,10 +178,29 @@ const MultiPlayerPage = () => {
     </div>
   );
 
+  // Ready confirmation alert component
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">
       {/* Show countdown overlay if needed */}
       {showCountdown && <CountdownOverlay />}
+
+      {/* Show ready confirmation alert if needed */}
+      {showReadyAlert && (
+        <ReadyConfirmAlert
+          setShowReadyAlert={setShowReadyAlert}
+          handleReadyConfirm={handleReadyConfirm}
+        />
+      )}
+
+      {/* Room title */}
+      <div className="mb-6 text-center">
+        <h1 className="text-2xl md:text-3xl font-bold text-white mb-1 flex items-center justify-center gap-2">
+          <Home size={24} className="text-yellow-500" />
+          {room.name}
+        </h1>
+        <div className="text-slate-400 text-sm">Multiplayer Typing Race</div>
+      </div>
 
       {/* Room info header */}
       <div className="bg-slate-800/60 rounded-lg p-4 mb-6 shadow-lg border border-slate-700">
@@ -294,7 +324,10 @@ const MultiPlayerPage = () => {
         <div className="flex justify-center">
           <button
             onClick={() => {
-              fnMarkReady(room?.id, currentUser.id);
+              // Show confirmation alert instead of immediately marking ready
+              if (!isCurrentUserReady) {
+                setShowReadyAlert(true);
+              }
             }}
             className={`px-8 py-3 rounded-full font-medium transition-all duration-300 text-center min-w-[120px] ${
               isCurrentUserReady

@@ -14,7 +14,7 @@ export const useEngin = () => {
     const [totalTime, setTotalTime] = useState(TOTAL_TIME);
     const { input, setInput } = useInputContext();
     const { setTimeLeft,
-        calculateWPM, calculateAccuracy, calculateWords, handelTyping, timeLeft, resetCountdown, setIsTyping
+        calculateWPM, calculateAccuracy, calculateWords, handelTyping, timeLeft, resetCountdown, setIsTyping , error , setError
     } = useType(words, totalTime, updateGeneratedWords);
     const navigate = useNavigate();
     const socketInstance = getSocket();
@@ -25,8 +25,13 @@ export const useEngin = () => {
         return socket;
     };
 
- 
-
+    
+    useEffect(() => {
+        setInput('');
+        resetCountdown();
+        updateWords();
+        setError(0);
+    } , []);
     // Reset countdown when totalTime changes
     useEffect(() => {
         resetCountdown();
@@ -55,5 +60,5 @@ export const useEngin = () => {
         }
     }, [handelTyping]);
 
-    return { calculateAccuracy, words, restart, input, setInput, timeLeft, calculateWords, calculateWPM, setTimeLeft, setTotalTime, totalTime, handelTyping, socket, getInitilizedSocket };
+    return { calculateAccuracy, words, restart, input, setInput, timeLeft, calculateWords, calculateWPM, setTimeLeft, setTotalTime, totalTime, handelTyping, socket, getInitilizedSocket , error };
 };

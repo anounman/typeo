@@ -67,6 +67,7 @@ export class UserImpl implements UserInterface {
  */
 export class RoomImpl implements RoomInterface {
     id: string;
+    name: string;
     users: User[];
     isActive: boolean;
     createdAt: Date;
@@ -76,6 +77,7 @@ export class RoomImpl implements RoomInterface {
 
     constructor({
         id,
+        name,
         users = [],
         isActive = false,
         createdAt = new Date(),
@@ -84,6 +86,7 @@ export class RoomImpl implements RoomInterface {
         totalTime,
     }: {
         id: string;
+        name: string;
         users?: User[];
         isActive?: boolean;
         createdAt?: Date;
@@ -92,6 +95,7 @@ export class RoomImpl implements RoomInterface {
         totalTime: number;
     }) {
         this.id = id;
+        this.name = name;
         this.users = users;
         this.isActive = isActive;
         this.createdAt = createdAt;
@@ -103,8 +107,8 @@ export class RoomImpl implements RoomInterface {
     /**
      * Create a new empty room
      */
-    static create(id: string, word: string, totalTime: number): RoomImpl {
-        return new RoomImpl({ id, createdAt: new Date(), word: word, totalTime: totalTime });
+    static create(id: string, name: string, word: string, totalTime: number): RoomImpl {
+        return new RoomImpl({ id: id, name: name, createdAt: new Date(), word: word, totalTime: totalTime });
     }
 
     /**

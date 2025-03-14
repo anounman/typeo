@@ -1,6 +1,8 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export const useCalculate = (input: string, originalWrod: string, total_time: number) => {
+
+    const [error, setError] = useState<number>(0);
     const calculateWords = useCallback(() => {
         let count: number = 0;
 
@@ -13,13 +15,17 @@ export const useCalculate = (input: string, originalWrod: string, total_time: nu
     }, [input]);
 
 
-    const calculateAccuracy = useCallback(() => {
-        let correct = 0;
-        for (let i = 0; i < input.length; i++) {
-            if (input[i] === originalWrod[i]) correct++;
-        }
-        return input.length > 0 ? (correct / input.length) * 100 : 100;
+    useEffect(() => {
+        calculateTheErros();
     }, [input, originalWrod]);
+
+
+    const calculateAccuracy = useCallback(() => {
+        const totalCharacters = input.length;
+        if (totalCharacters === 0) return 100;
+        const accuracy = ((totalCharacters - error) / totalCharacters) * 100;
+        return Math.max(0, Math.min(100, accuracy)); // Ensuring value is between 0 and 100
+    }, [input, error]);
 
 
     const calculateWPM = useCallback(() => {
@@ -39,15 +45,14 @@ export const useCalculate = (input: string, originalWrod: string, total_time: nu
 
 
     const calculateTheErros = useCallback(() => {
-        let count: number = 0;
         for (let index = 0; index < input.length; index++) {
             if (input[index] !== originalWrod[index]) {
-                count++;
+                setError(error + 1);
             }
         }
-        return count;
-    }, [input, originalWrod]);
+        return error;
+    }, [input, originalWrod, setError]);
 
 
-    return { calculateWords, calculateAccuracy, calculateWPM, calculateRawWords, calculateTheErros };
+    return { calculateWords, calculateAccuracy, calculateWPM, calculateRawWords, calculateTheErros, error, setError };
 }

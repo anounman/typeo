@@ -29,7 +29,7 @@ const JoinOrCreateRoom = ({
   const { fn: createRoomFn } = useSocket(createRoom);
   const { fn: joinRoomFn } = useSocket(joinRoom);
 
-  const handleOverlayClick = (e) => {
+  const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) {
       setShowOnlineOptions(false);
     }
@@ -84,6 +84,7 @@ const JoinOrCreateRoom = ({
 
     const newRoom = new RoomImpl({
       id: uuid().toString(),
+      name : roomName,
       users: [newUser],
       word: words,
       totalTime: selectedTime,

@@ -134,6 +134,8 @@ export const markAsReady = (roomId: string, userId: string): Promise<Room | void
 
     // User marked as ready
     socket.once('room:user_ready', ({ room }: { room: Room }) => {
+      console.log('User marked as ready:', room);
+
       resolve(room);
     });
 

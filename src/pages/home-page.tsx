@@ -19,6 +19,8 @@ const HomePage = () => {
     input,
     timeLeft,
     calculateWords,
+    calculateWPM,
+    error,
     totalTime,
     setTotalTime,
   } = useEngin();
@@ -89,10 +91,11 @@ const HomePage = () => {
           </div>
 
           <Results
-            errors={0}
+            errors={error}
             accuracyPercentage={calculateAccuracy()}
             wordCount={calculateWords()}
-            className="grid grid-cols-3 gap-4"
+            wpm={calculateWPM ? calculateWPM() : undefined}
+            className="" // Let Results component handle its own layout
           />
         </div>
       </div>
