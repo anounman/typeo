@@ -2,7 +2,16 @@ import { CoundownTimer } from "@/components/ui/countdown-timer";
 import { GeneratedText } from "@/components/ui/generated-text";
 import { Room, User } from "@/types/type";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Crown, Users, Code, Clock, Copy, Check, Home } from "lucide-react";
+import {
+  Crown,
+  Users,
+  Code,
+  Clock,
+  Copy,
+  Check,
+  Home,
+  BarChart,
+} from "lucide-react";
 import useSocket from "@/hooks/useSocket";
 import {
   cleanupRoomEventListeners,
@@ -15,6 +24,7 @@ import Cursor from "@/components/ui/cursor";
 import { useOnlineEngine } from "@/hooks/useOnlineEngine";
 import { sendTypingProgress, setupUserEventListener } from "@/api/user-socket";
 import { ReadyConfirmAlert } from "@/components/ui/ready-confirm-alret";
+import Results from "@/components/Results";
 
 const MultiPlayerPage = () => {
   const location = useLocation();
@@ -36,7 +46,15 @@ const MultiPlayerPage = () => {
   const { fn: fnMarkReady } = useSocket(markAsReady);
   const { fn: updateRoomFn } = useSocket(updateRoom);
 
-  const { input, timeLeft, totalTime } = useOnlineEngine({
+  const {
+    input,
+    timeLeft,
+    totalTime,
+    calculateAccuracy,
+    calculateWPM,
+    error,
+    calculateWords,
+  } = useOnlineEngine({
     room: room,
     setRoom: setRoom,
     setWord: setWord,
@@ -318,6 +336,22 @@ const MultiPlayerPage = () => {
           ))}
         </div>
       </div>
+      {raceStart && (
+        <div className="bg-slate-800/60 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-slate-700/50">
+          <div className="flex items-center gap-2 mb-5 justify-center">
+            <BarChart size={20} className="text-yellow-500" />
+            <h2 className="text-xl font-semibold text-white">Performance</h2>
+          </div>
+
+          <Results
+            errors={error}
+            accuracyPercentage={calculateAccuracy()}
+            wordCount={calculateWords()}
+            wpm={calculateWPM ? calculateWPM() : undefined}
+            className="" // Let Results component handle its own layout
+          />
+        </div>
+      )}
 
       {/* Ready Button (only show if race hasn't started) */}
       {!raceStart && !showCountdown && (

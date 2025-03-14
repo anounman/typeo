@@ -32,7 +32,8 @@ export const useOnlineEngine = ({
         handelTyping,
         timeLeft,
         setIsTyping,
-        startCountdown
+        startCountdown,
+        error,
     } = useType(words, totalTime, updateGeneratedWords, setRoom, raceStart, room, true , user.id);
 
     const socketInstance = getSocket();
@@ -102,6 +103,7 @@ export const useOnlineEngine = ({
         totalTime,
         handelTyping,
         socket,
-        getInitilizedSocket
+        getInitilizedSocket,
+        error
     };
 };
