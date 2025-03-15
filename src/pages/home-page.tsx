@@ -33,7 +33,7 @@ const HomePage = () => {
           <div className="bg-gradient-to-br from-yellow-500 to-amber-600 p-2 rounded-lg shadow-lg">
             <Keyboard size={28} className="text-slate-900" />
           </div>
-          <h1 className="text-3xl font-bold text-white">TypeO</h1>
+          <h1 className="text-3xl font-bold text-white">TypeTourney</h1>
         </div>
 
         <button

@@ -508,12 +508,12 @@ function ResultPage() {
               if (navigator.share) {
                 navigator.share({
                   title: "My Typing Test Results",
-                  text: `I just typed at ${wpm} WPM with ${accuracy}% accuracy on TypeO!`,
+                  text: `I just typed at ${wpm} WPM with ${accuracy}% accuracy on TypeTourney!`,
                 });
               } else {
                 // Fallback - copy to clipboard
                 navigator.clipboard.writeText(
-                  `I just typed at ${wpm} WPM with ${accuracy}% accuracy on TypeO!`
+                  `I just typed at ${wpm} WPM with ${accuracy}% accuracy on TypeTourney!`
                 );
                 alert("Results copied to clipboard!");
               }

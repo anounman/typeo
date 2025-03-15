@@ -1,7 +1,7 @@
 ### Backend Explanation
 
 For detailed implementation of the backend code and architecture, please refer to our backend repository:
-[Backend Code Repository](https://github.com/anounman/typeo/tree/backend)
+[Backend Code Repository](https://github.com/anounman/TypeTourney/tree/backend)
 
 
 # React + TypeScript + Vite
@@ -62,4 +62,4 @@ export default tseslint.config({
 ### Backend Explanation
 
 For detailed implementation of the backend code and architecture, please refer to our backend repository:
-[Backend Code Repository](https://github.com/anounman/typeo/tree/backend)
+[Backend Code Repository](https://github.com/anounman/TypeTourney/tree/backend)
