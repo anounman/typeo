@@ -16,7 +16,14 @@ export const useCalculate = (input: string, originalWrod: string, total_time: nu
 
 
     useEffect(() => {
-        calculateTheErros();
+        // Recalculate errors from scratch on each input change
+        let currentErrors = 0;
+        for (let index = 0; index < input.length; index++) {
+            if (input[index] !== originalWrod[index]) {
+                currentErrors++;
+            }
+        }
+        setError(currentErrors);
     }, [input, originalWrod]);
 
 
@@ -33,6 +40,7 @@ export const useCalculate = (input: string, originalWrod: string, total_time: nu
 
         return Number.isNaN(totalAvgWords) ? 0 : totalAvgWords;
     }, [input, total_time]);
+    
     const calculateRawWords = useCallback(() => {
         let count: number = 0;
         input.split(" ").map((word, index) => {
@@ -45,13 +53,10 @@ export const useCalculate = (input: string, originalWrod: string, total_time: nu
 
 
     const calculateTheErros = useCallback(() => {
-        for (let index = 0; index < input.length; index++) {
-            if (input[index] !== originalWrod[index]) {
-                setError(error + 1);
-            }
-        }
+        // This function now just returns the current error count
+        // since we're calculating it in the useEffect
         return error;
-    }, [input, originalWrod, setError]);
+    }, [error]);
 
 
     return { calculateWords, calculateAccuracy, calculateWPM, calculateRawWords, calculateTheErros, error, setError };

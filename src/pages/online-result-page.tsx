@@ -427,7 +427,7 @@ const OnlineResultPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
-            className="bg-slate-800/60 flex flex-col items-center justify-center rounded-xl p-4 md:p-6 mb-8 border border-slate-700/50"
+            className="bg-slate-800/60 grid justify-center rounded-xl p-4 md:p-6 mb-8 border border-slate-700/50"
           >
             <div className="mb-4">
               <h2 className="text-lg font-medium text-white flex items-center">

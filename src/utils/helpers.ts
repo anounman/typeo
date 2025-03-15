@@ -10,12 +10,13 @@ export const formateInput = (e: KeyboardEvent, setInput: React.Dispatch<React.Se
   }
 
   // Regular typing game logic
-  if (isRunning && e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey && e.key !== 'Shift') {
-    setInput((prev: string) => prev + e.key);
-  }
   if (e.key === 'Backspace') {
     setInput((prev: string) => prev.slice(0, -1));
   }
+  else if (isRunning && e.key.length === 1 && !e.ctrlKey && !e.altKey && !e.metaKey && e.key !== 'Shift') {
+    setInput((prev: string) => prev + e.key);
+  }
+
 }
 
 export const generateWords = (wordsCount: number) => {
