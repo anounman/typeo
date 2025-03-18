@@ -1,34 +1,43 @@
-### Backend Explanation
+# TypeTourney - Real-Time Typing Race Application
 
-For detailed implementation of the backend code and architecture, please refer to our backend repository:
-[Backend Code Repository](https://github.com/anounman/TypeTourney/tree/backend)
+A competitive typing application where users can race against each other in real-time typing competitions.
 
+## Project Overview
 
-# React + TypeScript + Vite
+Typo allows users to:
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+- Create and join typing race rooms
+- Compete against other users in real-time
+- Track typing speed and accuracy statistics
 
-Currently, two official plugins are available:
+## Repository Structure
+
+This repository contains both frontend and backend code:
+
+- **Frontend**: React + TypeScript + Vite
+- **Backend**: Node.js with Express, Socket.IO, and TypeScript
+
+## Frontend Setup
+
+This project uses React with TypeScript and Vite for fast development experience.
+
+### Available Plugins
 
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Expanding the ESLint configuration
+### ESLint Configuration
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+For production applications, enable type-aware lint rules:
 
 ```js
 export default tseslint.config({
   extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
     ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
+    // Alternatively: ...tseslint.configs.strictTypeChecked,
+    // Optional: ...tseslint.configs.stylisticTypeChecked,
   ],
   languageOptions: {
-    // other options...
     parserOptions: {
       project: ["./tsconfig.node.json", "./tsconfig.app.json"],
       tsconfigRootDir: import.meta.dirname,
@@ -37,7 +46,7 @@ export default tseslint.config({
 });
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+For React-specific lint rules:
 
 ```js
 // eslint.config.js
@@ -46,20 +55,30 @@ import reactDom from "eslint-plugin-react-dom";
 
 export default tseslint.config({
   plugins: {
-    // Add the react-x and react-dom plugins
     "react-x": reactX,
     "react-dom": reactDom,
   },
   rules: {
-    // other rules...
-    // Enable its recommended typescript rules
     ...reactX.configs["recommended-typescript"].rules,
     ...reactDom.configs.recommended.rules,
   },
 });
 ```
 
-### Backend Explanation
+## Backend Implementation
 
-For detailed implementation of the backend code and architecture, please refer to our backend repository:
-[Backend Code Repository](https://github.com/anounman/TypeTourney/tree/backend)
+The backend provides:
+
+- Real-time communication via Socket.IO
+- Room management for typing races
+- User tracking and race progress monitoring
+
+For detailed backend implementation and architecture, see:
+[Backend Code Repository](https://github.com/anounman/TypeTourney/tree/backend) or refer to the `backend.md` file in this repository.
+
+## Development
+
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Start development server: `npm run dev`
+4. For production: `npm build` followed by `npm start`
