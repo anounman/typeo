@@ -151,33 +151,7 @@ export const markAsReady = (roomId: string, userId: string): Promise<Room | void
 };
 
 
-// update the room when we chang the room on room:update
-export const updateRoom = (room: Room): Promise<Room | void> => {
-  return new Promise<Room | void>((resolve, reject) => {
-    initializeSocket();
-    if (!socket) {
-      reject(new Error('Socket not initialized'));
-      return;
-    }
 
-    socket.emit('room:update', { room });
-
-
-    // Set up a one-time listener for the response
-    socket.once('room:update_data', ({ room }: { room: Room }) => {
-      resolve(room);
-    });
-
-    socket.once('room:update_error', ({ message }: { message: string }) => {
-      reject(new Error(message));
-    });
-
-    // Timeout for response
-    setTimeout(() => {
-      reject(new Error('Room update timed out'));
-    }, 5000);
-  });
-}
 
 // Set up event listeners for room events (user joined, user left, etc.)
 export const setupRoomEventListeners = (
