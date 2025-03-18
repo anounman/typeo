@@ -74,7 +74,7 @@ The backend provides:
 - User tracking and race progress monitoring
 
 For detailed backend implementation and architecture, see:
-[Backend Code Repository](https://github.com/anounman/TypeTourney/tree/backend) or refer to the `backend.md` file in this repository.
+[Backend Code Repository](https://github.com/anounman/TypeTourney_backend) or refer to the `backend.md` file in this repository.
 
 ## Development
 
